@@ -1,0 +1,83 @@
+name: ETL → GitHub Pages data
+# Human-friendly name shown in the GitHub Actions UI.
+
+on:
+  schedule:
+    - cron: "0 12 * * *"   # daily 12:00 UTC
+  workflow_dispatch:
+# Triggers:
+# - schedule: GitHub triggers the workflow based on cron (in UTC).
+# - workflow_dispatch: enables a "Run workflow" button in the GitHub UI for manual tests.
+# Triggering workflows is a GitHub Actions feature. :contentReference[oaicite:1]{index=1}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+# Grants the job a permission scope for the automatically provided GITHUB_TOKEN.
+# For Pages deployment via actions/deploy-pages, pages:write and id-token:write are required. :contentReference[oaicite:2]{index=2}
+# contents:read allows reading the repo content (checkout, etc.).
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+# Concurrency prevents multiple overlapping runs from deploying at the same time.
+# If a new run starts while an old run is running, the old one is canceled.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # This job runs on a GitHub-hosted Ubuntu runner (ephemeral VM).
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        # Fetches (clones) your repository into the runner's workspace so subsequent steps can access files.
+        # It checks out the commit/ref that triggered the workflow; it does NOT create a new branch. :contentReference[oaicite:3]{index=3}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+        # Installs/activates Python 3.11 on the runner so `python` points to that version.
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        # Installs Python dependencies listed in requirements.txt.
+
+      - name: Run ETL
+        env:
+          ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+        run: |
+          python etl/main.py
+        # Runs your ETL script.
+        # GitHub injects the repository secret into an environment variable for this step.
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        # Prepares the workflow to publish to GitHub Pages in "GitHub Actions" mode.
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+        # Packages and uploads the "site/" directory as a Pages artifact (the deployable content). :contentReference[oaicite:4]{index=4}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    # This job waits until the build job finishes successfully.
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Targets the recommended "github-pages" environment for Pages deployments. :contentReference[oaicite:5]{index=5}
+    # It also publishes the deployment URL in the GitHub UI when done.
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        # Deploys the previously uploaded Pages artifact to GitHub Pages. :contentReference[oaicite:6]{index=6}
