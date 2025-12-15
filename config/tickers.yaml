@@ -1,0 +1,53 @@
+groups:
+  Magnificent7:
+    asset_class: Equity
+    currency: USD
+    tickers:
+      - symbol: AAPL
+        name: Apple Inc.
+      - symbol: MSFT
+        name: Microsoft Corp.
+      - symbol: GOOGL
+        name: Alphabet Inc.
+      - symbol: AMZN
+        name: Amazon.com Inc.
+      - symbol: META
+        name: Meta Platforms Inc.
+      - symbol: NVDA
+        name: NVIDIA Corp.
+      - symbol: TSLA
+        name: Tesla Inc.
+
+  ETFs:
+    asset_class: Equity
+    currency: USD
+    tickers:
+      - symbol: SPY
+        name: SPDR S&P 500 ETF
+      - symbol: QQQ
+        name: Invesco QQQ Trust
+      - symbol: EFA
+        name: iShares MSCI EAFE ETF
+      - symbol: IWM
+        name: iShares Russell 2000 ETF
+
+  FX:
+    asset_class: FX
+    currency: USD
+    tickers:
+      - symbol: EURUSD
+        name: EUR/USD
+      - symbol: GBPUSD
+        name: GBP/USD
+
+  Crypto:
+    asset_class: Crypto
+    currency: USD
+    tickers:
+      - symbol: BTC
+        name: Bitcoin
+        market: USD
+      - symbol: ETH
+        name: Ethereum
+        market: USD
+

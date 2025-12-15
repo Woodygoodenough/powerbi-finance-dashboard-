@@ -1,3 +1,6 @@
 requests
 pydantic
 pydantic-settings
+pandas
+numpy
+pyyaml
