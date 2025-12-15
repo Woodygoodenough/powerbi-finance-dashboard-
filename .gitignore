@@ -208,3 +208,6 @@ __marimo__/
 
 data/
 docs/
+
+# macOS
+.DS_Store
